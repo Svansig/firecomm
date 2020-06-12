@@ -1,73 +1,73 @@
-const generateMeta = require("../utils/generateMeta");
+import generateMeta from "../utils/generateMeta";
 
-module.exports = function duplexCall(that, methodName, first, second) {
+export default function duplexCall(that, methodName, first, second) {
   let metadata = null;
   let interceptors = null;
   if (typeof first === "object") {
     if (Array.isArray(first)) {
       interceptors = { interceptors: first };
     } else {
-      const {options} = first;
+      const { options } = first;
       delete first.options;
       metadata = generateMeta(first, options);
     }
-  };
+  }
   if (typeof second === "object") {
     if (Array.isArray(second)) {
       interceptors = { interceptors: second };
     } else {
-      const {options} = second;
+      const { options } = second;
       delete second.options;
       metadata = generateMeta(second, options);
     }
-  };
+  }
   const duplex = that[methodName](metadata, interceptors);
   const duplexObj = {
     // throw: function(metadata) {
     //   sender.throw()
     // },
-    getPeer: function() {
+    getPeer: function () {
       return duplex.getPeer();
     },
-    write: function(...args) {
-      return this.send(...args)
+    write: function (...args) {
+      return this.send(...args);
     },
-    send: function(message, flags, flushCallback) {
+    send: function (message, flags, flushCallback) {
       duplex.write(message, flags, flushCallback);
       return duplexObj;
     },
-    catch: function(first) {
-      if (typeof first !== 'function') {
-        throw new Error('Unary Call: catch takes a callback')
+    catch: function (first) {
+      if (typeof first !== "function") {
+        throw new Error("Unary Call: catch takes a callback");
       }
-      duplex.on('error', first);
+      duplex.on("error", first);
       return duplexObj;
     },
     on: (first, second) => {
       let listenerCallback;
-      if (typeof first !== 'function' && typeof second !== 'function') {
-        throw new Error('Unary Call: on takes a callback')
-      };
-      if (typeof first === 'function') {
+      if (typeof first !== "function" && typeof second !== "function") {
+        throw new Error("Unary Call: on takes a callback");
+      }
+      if (typeof first === "function") {
         listenerCallback = first;
       } else {
         listenerCallback = second;
-      };
+      }
       switch (first) {
-        case 'status': 
-          duplex.on('status', second);
+        case "status":
+          duplex.on("status", second);
           break;
-        case 'metadata': 
-          duplex.on('metadata', second);
+        case "metadata":
+          duplex.on("metadata", second);
           break;
-        case 'error': 
-          duplex.on('error', second);
+        case "error":
+          duplex.on("error", second);
           break;
-        default: 
-          duplex.on('data', listenerCallback);
-        }
-    return duplexObj;
-    }
-  }
+        default:
+          duplex.on("data", listenerCallback);
+      }
+      return duplexObj;
+    },
+  };
   return duplexObj;
-};
+}

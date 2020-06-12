@@ -4,12 +4,12 @@
 // .on is a method that immediately invokes on the body
 //this.body becomes the thing
 
-module.exports = function clientUnaryDecorator(customCall, originalCall) {
+export default function clientUnaryDecorator(customCall, originalCall) {
   customCall.body = originalCall.request;
 
   customCall.head = originalCall.metadata;
 
-  customCall.on = function(string, callback) {
+  customCall.on = function (string, callback) {
     if (typeof string !== "function" && callback === undefined) {
       throw new Error("Second parameter to .on must be a callback.");
     }
@@ -28,10 +28,12 @@ module.exports = function clientUnaryDecorator(customCall, originalCall) {
         } else if (event === "cancelled") {
           originalCall.on("cancelled", callback);
         } else {
-          throw new Error('Only the "data" and "metadata" events are supported by unary .on');
+          throw new Error(
+            'Only the "data" and "metadata" events are supported by unary .on'
+          );
         }
       }
     }
     return this;
   };
-};
+}

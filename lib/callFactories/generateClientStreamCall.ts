@@ -1,8 +1,8 @@
-const grpc = require("grpc");
+import grpc from "grpc";
 
-const basicCallDecorator = require("./callDecorators/basicCallDecorator");
-const clientStreamDecorator = require("./callDecorators/clientStreamDecorator");
-const serverUnaryDecorator = require("./callDecorators/serverUnaryDecorator");
+import basicCallDecorator from "./callDecorators/basicCallDecorator";
+import clientStreamDecorator from "./callDecorators/clientStreamDecorator";
+import serverUnaryDecorator from "./callDecorators/serverUnaryDecorator";
 
 function generateClientStreamCall(ServerReadableStream, callback) {
   const ServerReadableStreamClone = Object.create(ServerReadableStream);
@@ -11,7 +11,7 @@ function generateClientStreamCall(ServerReadableStream, callback) {
   ServerReadableStreamClone.metaData = undefined;
   ServerReadableStreamClone.err = null;
   ServerReadableStreamClone.trailer = undefined;
-  ServerReadableStreamClone.throw = function(err) {
+  ServerReadableStreamClone.throw = function (err) {
     if (!(err instanceof Error)) {
       throw new Error(
         "Please pass your error details as an Error class. Firecomm supports adding additional error metadata in the trailers property using call.setStatus()"
@@ -19,7 +19,7 @@ function generateClientStreamCall(ServerReadableStream, callback) {
     }
     this.callback(err, {}, this.trailer);
   };
-  ServerReadableStreamClone.setStatus = function(metaObject) {
+  ServerReadableStreamClone.setStatus = function (metaObject) {
     if (!this.trailer) {
       this.trailer = new grpc.Metadata();
     }
@@ -29,7 +29,7 @@ function generateClientStreamCall(ServerReadableStream, callback) {
     }
   };
 
-  ServerReadableStreamClone.setMeta = function(metaObject) {
+  ServerReadableStreamClone.setMeta = function (metaObject) {
     if (!this.metaData) {
       this.metaData = new grpc.Metadata();
     }
@@ -39,7 +39,7 @@ function generateClientStreamCall(ServerReadableStream, callback) {
     }
   };
 
-  ServerReadableStreamClone.send = function(message = {}) {
+  ServerReadableStreamClone.send = function (message = {}) {
     if (this.metaData) {
       this.sendMetadata(this.metaData);
     }
@@ -49,10 +49,10 @@ function generateClientStreamCall(ServerReadableStream, callback) {
   return ServerReadableStreamClone;
 }
 
-module.exports = function(ServerReadableStream, callback) {
+export default function (ServerReadableStream, callback) {
   const ServerReadableStreamClone = Object.create(ServerReadableStream);
   basicCallDecorator(ServerReadableStreamClone, ServerReadableStream);
   clientStreamDecorator(ServerReadableStreamClone, ServerReadableStream);
   serverUnaryDecorator(ServerReadableStreamClone, callback);
   return ServerReadableStreamClone;
-};
+}

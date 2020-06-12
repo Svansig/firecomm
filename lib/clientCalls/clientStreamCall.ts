@@ -1,13 +1,13 @@
-const generateMeta = require("../utils/generateMeta");
+import generateMeta from "../utils/generateMeta";
 
-module.exports = function clientStreamCall(that, methodName, first, second) {
+export default function clientStreamCall(that, methodName, first, second) {
   let metadata = null;
   let interceptors = null;
   if (typeof first === "object") {
     if (Array.isArray(first)) {
       interceptors = { interceptors: first };
     } else {
-      const {options} = first;
+      const { options } = first;
       delete first.options;
       metadata = generateMeta(first, options);
     }
@@ -16,12 +16,12 @@ module.exports = function clientStreamCall(that, methodName, first, second) {
     if (Array.isArray(second)) {
       interceptors = { interceptors: second };
     } else {
-      const {options} = second;
+      const { options } = second;
       delete second.options;
       metadata = generateMeta(second, options);
     }
   }
-  let callback = function(err, res) {
+  let callback = function (err, res) {
     if (err) clientStreamObj.$catch(err);
     clientStreamObj.$on(res);
   };
@@ -30,22 +30,20 @@ module.exports = function clientStreamCall(that, methodName, first, second) {
     // throw: function(metadata) {
     //   sender.throw()
     // },
-    getPeer: function() {
+    getPeer: function () {
       return sender.getPeer();
     },
-    write: function(...args) {
-      return this.send(...args)
+    write: function (...args) {
+      return this.send(...args);
     },
-    send: function(message, flags, flushCallback) {
+    send: function (message, flags, flushCallback) {
       sender.write(message, flags, flushCallback);
       return clientStreamObj;
     },
-    $catch: function() {
-      throw new Error(
-        "Client Stream: .catch and .on must be defined to .send"
-      );
+    $catch: function () {
+      throw new Error("Client Stream: .catch and .on must be defined to .send");
     },
-    catch: function(first) {
+    catch: function (first) {
       if (typeof first !== "function") {
         throw new Error("Client Stream: catch takes a callback");
       }
@@ -53,11 +51,9 @@ module.exports = function clientStreamCall(that, methodName, first, second) {
       return clientStreamObj;
     },
     $on: (res) => {
-      throw new Error(
-        "Client Stream: .catch and .on must be invoked to .send"
-      );
+      throw new Error("Client Stream: .catch and .on must be invoked to .send");
     },
-    on: function(first, second) {
+    on: function (first, second) {
       let listenerCallback;
       if (typeof first !== "function" && typeof second !== "function") {
         throw new Error("Client Stream: on takes a callback");
@@ -68,21 +64,20 @@ module.exports = function clientStreamCall(that, methodName, first, second) {
         listenerCallback = second;
       }
       switch (first) {
-        case 'status': 
-          sender.on('status', second);
+        case "status":
+          sender.on("status", second);
           break;
-        case 'metadata': 
-          sender.on('metadata', second);
+        case "metadata":
+          sender.on("metadata", second);
           break;
-        case 'error': 
+        case "error":
           clientStreamObj.catch(second);
           break;
-        default: 
+        default:
           clientStreamObj.$on = listenerCallback;
       }
       return clientStreamObj;
-    }
+    },
   };
   return clientStreamObj;
-
-};
+}

@@ -1,9 +1,9 @@
-const grpc = require('grpc');
+import grpc from "grpc";
 // takes in a js object, returns a grpc metadata object with the same properties
-module.exports = function generateMeta(metaObject, options) {
+export default function generateMeta(metaObject, options) {
   if (metaObject === undefined) {
     return new grpc.Metadata();
-    }
+  }
   const metadata = new grpc.Metadata(options);
   const keys = Object.keys(metaObject);
   for (let i = 0; i < keys.length; i++) {

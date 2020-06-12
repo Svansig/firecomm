@@ -1,7 +1,7 @@
-const grpc = require("grpc");
-const generateMeta = require("../../utils/generateMeta");
+import grpc from "grpc";
+import generateMeta from "../../utils/generateMeta";
 
-module.exports = function serverUnaryDecorator(customCall, sendCallback) {
+export default function serverUnaryDecorator(customCall, sendCallback) {
   customCall.metadata = undefined;
   customCall.sendCallback = sendCallback;
 
@@ -9,7 +9,7 @@ module.exports = function serverUnaryDecorator(customCall, sendCallback) {
   //   customCall.send(...args);
   // }
 
-  customCall.send = function(message, flags) {
+  customCall.send = function (message, flags) {
     if (this.metadata) {
       this.call.sendMetadata(generateMeta(this.metadata));
     }
@@ -17,7 +17,7 @@ module.exports = function serverUnaryDecorator(customCall, sendCallback) {
     return this;
   };
 
-  customCall.set = function(object, options) {
+  customCall.set = function (object, options) {
     // loop through
     if (typeof object !== "object") {
       throw new Error("Set should be passed an object with string values.");
@@ -25,7 +25,7 @@ module.exports = function serverUnaryDecorator(customCall, sendCallback) {
     if (this.metadata) {
       this.metadata = {
         ...this.metadata,
-        ...object
+        ...object,
       };
     } else {
       this.metadata = { ...object };
@@ -33,7 +33,7 @@ module.exports = function serverUnaryDecorator(customCall, sendCallback) {
     return this;
   };
 
-  customCall.throw = function(err, trailers) {
+  customCall.throw = function (err, trailers) {
     if (!(err instanceof Error)) {
       throw new Error(
         "Please pass your error details as an Error class. Firecomm supports adding additional error metadata in the trailers property using call.setStatus()"
@@ -59,4 +59,4 @@ module.exports = function serverUnaryDecorator(customCall, sendCallback) {
     this.sendCallback(err, {}, this.trailers);
     return this;
   };
-};
+}

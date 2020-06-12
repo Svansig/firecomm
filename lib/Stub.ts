@@ -1,13 +1,13 @@
-const grpc = require("grpc");
-const fs = require("fs");
+import grpc from "grpc";
+import fs from "fs";
 
-const generateMeta = require("./utils/generateMeta");
-const getMethodType = require("./utils/getMethodType");
+import generateMeta from "./utils/generateMeta";
+import getMethodType from "./utils/getMethodType";
 
-const unaryCall = require("./clientCalls/unaryCall");
-const clientStreamCall = require("./clientCalls/clientStreamCall");
-const serverStreamCall = require("./clientCalls/serverStreamCall");
-const duplexCall = require("./clientCalls/duplexCall");
+import unaryCall from "./clientCalls/unaryCall";
+import clientStreamCall from "./clientCalls/clientStreamCall";
+import serverStreamCall from "./clientCalls/serverStreamCall";
+import duplexCall from "./clientCalls/duplexCall";
 
 /**
  * @class The Stub constructor generates an instance of Firecomm's Stub class, which extends the native gRPC client-service instance.
@@ -22,7 +22,7 @@ const duplexCall = require("./clientCalls/duplexCall");
  * @returns {Object} an instance of the Firecomm Stub class
  *
  */
-module.exports = function Stub(serviceDefinition, port, config) {
+export default function Stub(serviceDefinition, port, config) {
   class Stub extends serviceDefinition {
     constructor(port, securitySettings, options) {
       super(port, securitySettings, options);
@@ -58,12 +58,12 @@ module.exports = function Stub(serviceDefinition, port, config) {
       if (methodType === "Unary") {
         // 'message' will always be an object with *any* kind of data as properties that fit the .proto file
         // configuation
-        this[lowerCaseName] = function(metaObject, interceptorArray) {
+        this[lowerCaseName] = function (metaObject, interceptorArray) {
           const that = this;
           return unaryCall(that, methodName, metaObject, interceptorArray);
         };
       } else if (methodType === "ClientStream") {
-        this[lowerCaseName] = function(metaObject, interceptorArray) {
+        this[lowerCaseName] = function (metaObject, interceptorArray) {
           const that = this;
           return clientStreamCall(
             that,
@@ -73,7 +73,7 @@ module.exports = function Stub(serviceDefinition, port, config) {
           );
         };
       } else if (methodType === "ServerStream") {
-        this[lowerCaseName] = function(metaObject, interceptorArray) {
+        this[lowerCaseName] = function (metaObject, interceptorArray) {
           const that = this;
           return serverStreamCall(
             that,
@@ -87,7 +87,7 @@ module.exports = function Stub(serviceDefinition, port, config) {
         };
       } else if (methodType === "Duplex") {
         // console.log({methodName});
-        this[lowerCaseName] = function(metaObject, interceptorArray) {
+        this[lowerCaseName] = function (metaObject, interceptorArray) {
           const that = this;
           return duplexCall(that, methodName, metaObject, interceptorArray);
           // const metadata = generateMeta(metaObject);
@@ -110,4 +110,4 @@ module.exports = function Stub(serviceDefinition, port, config) {
     const readCertificate = fs.readFileSync(unreadCertificate);
     return new Stub(port, grpc.credentials.createSsl(readCertificate), config);
   }
-};
+}

@@ -1,12 +1,12 @@
-const grpc = require("grpc");
-const fs = require("fs");
+import grpc from "grpc";
+import fs from "fs";
 
 // import health check methods
-const healthcheck = require("./custom-services/healthcheck-pkg");
-const checkHandler = require("./custom-services/healthcheck-handlers/check");
-const watchHandler = require("./custom-services/healthcheck-handlers/watch");
+import healthcheck from "./custom-services/healthcheck-pkg";
+import checkHandler from "./custom-services/healthcheck-handlers/check";
+import watchHandler from "./custom-services/healthcheck-handlers/watch";
 
-const compose = require("./compose");
+import compose from "./compose";
 /**
  * @class To run your service methods, you will need to create a gRPC server. Firecomm extends the native gRPC-node `Server` class, so any and all methods found on the native class are supported by Firecomm's class. The Firecomm `Server` class-instances have the following capabilities.
 - Instantiate an arbitrary number secure and insecure sockets with `.bind()`
@@ -24,7 +24,7 @@ const server = new Server(function( ERROR, CALL ) {
   if ( ERROR ) CALL.throw( ERROR );
 });
  */
-module.exports = class Server extends grpc.Server {
+export default class Server extends grpc.Server {
   constructor(/** @type {function} */ uncaughtErrorHandler, options) {
     // user put both handler and options in the right order
     if (
@@ -66,7 +66,7 @@ module.exports = class Server extends grpc.Server {
     this._statusMap = {};
     this.addService(healthcheck.HealthCheck, {
       check: checkHandler.bind(this),
-      watch: watchHandler.bind(this)
+      watch: watchHandler.bind(this),
     });
     this._ports = [];
   }
@@ -237,8 +237,8 @@ server.bind( '0.0.0.0:3000', {certificate, privateKey } )
           grpc.ServerCredentials.createSsl(readCertificate, [
             {
               private_key: readPrivateKey,
-              cert_chain: readCertificate
-            }
+              cert_chain: readCertificate,
+            },
           ])
         )
       );
@@ -251,14 +251,14 @@ server.bind( '0.0.0.0:3000', {certificate, privateKey } )
           grpc.ServerCredentials.createSsl(readCertificate, [
             {
               private_key: readPrivateKey,
-              cert_chain: readCertificate
-            }
+              cert_chain: readCertificate,
+            },
           ])
         )
       );
     } else if (Array.isArray(ports) && !sslConfigs) {
       console.log(sslConfigs);
-      ports.forEach(port => {
+      ports.forEach((port) => {
         boundPorts.push(
           super.bind(port, grpc.ServerCredentials.createInsecure())
         );
@@ -270,15 +270,15 @@ server.bind( '0.0.0.0:3000', {certificate, privateKey } )
     ) {
       readCertificate = fs.readFileSync(sslConfigs.certificate);
       readPrivateKey = fs.readFileSync(sslConfigs.privateKey);
-      ports.forEach(port => {
+      ports.forEach((port) => {
         boundPorts.push(
           super.bind(
             port,
             grpc.ServerCredentials.createSsl(readCertificate, [
               {
                 private_key: readPrivateKey,
-                cert_chain: readCertificate
-              }
+                cert_chain: readCertificate,
+              },
             ])
           )
         );
@@ -297,8 +297,8 @@ server.bind( '0.0.0.0:3000', {certificate, privateKey } )
             grpc.ServerCredentials.createSsl(readCertificate, [
               {
                 private_key: readPrivateKey,
-                cert_chain: readCertificate
-              }
+                cert_chain: readCertificate,
+              },
             ])
           )
         );
@@ -317,8 +317,8 @@ server.bind( '0.0.0.0:3000', {certificate, privateKey } )
             grpc.ServerCredentials.createSsl(readCertificate, [
               {
                 private_key: readPrivateKey,
-                cert_chain: readCertificate
-              }
+                cert_chain: readCertificate,
+              },
             ])
           )
         );
@@ -412,4 +412,4 @@ server.bind( '0.0.0.0:3000', {certificate, privateKey } )
   start() {
     super.start();
   }
-};
+}

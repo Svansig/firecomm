@@ -1,7 +1,7 @@
-const grpc = require("grpc");
-const protoLoader = require("@grpc/proto-loader");
+import grpc from "grpc";
+import protoLoader from "@grpc/proto-loader";
 
-module.exports = function build(
+export default function build(
   PROTO_PATH,
   config = {
     keepCase: true,
@@ -11,7 +11,7 @@ module.exports = function build(
     defaults: true, // Set default values on output objects. Defaults to false.
     arrays: true, // Set empty arrays for missing array values even if defaults is false Defaults to false.
     objects: true, // Set empty objects for missing object values even if defaults is false Defaults to false.
-    oneofs: true // Set virtual oneof properties to the present field's name. Defaults to false.
+    oneofs: true, // Set virtual oneof properties to the present field's name. Defaults to false.
     // includeDirs: ['',''] A list of search paths for imported .proto files.
   }
 ) {
@@ -24,9 +24,9 @@ module.exports = function build(
       defaults: true, // Set default values on output objects. Defaults to false.
       arrays: true, // Set empty arrays for missing array values even if defaults is false Defaults to false.
       objects: true, // Set empty objects for missing object values even if defaults is false Defaults to false.
-      oneofs: true // Set virtual oneof properties to the present field's name. Defaults to false.
+      oneofs: true, // Set virtual oneof properties to the present field's name. Defaults to false.
     },
-    ...config
+    ...config,
   };
   switch (true) {
     case config.keepCase !== false && config.keepCase !== true:
@@ -64,4 +64,4 @@ module.exports = function build(
       }
       return pkg;
   }
-};
+}

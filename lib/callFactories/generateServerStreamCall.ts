@@ -1,10 +1,10 @@
-const grpc = require("grpc");
+import grpc from "grpc";
 
-const generateMeta = require("../utils/generateMeta");
+import generateMeta from "../utils/generateMeta";
 
-const basicCallDecorator = require("./callDecorators/basicCallDecorator");
-const serverStreamDecorator = require("./callDecorators/serverStreamDecorator");
-const clientUnaryDecorator = require("./callDecorators/clientUnaryDecorator");
+import basicCallDecorator from "./callDecorators/basicCallDecorator";
+import serverStreamDecorator from "./callDecorators/serverStreamDecorator";
+import clientUnaryDecorator from "./callDecorators/clientUnaryDecorator";
 
 function generateServerStreamCall(ServerWritableStream) {
   ServerWritableStreamClone = Object.create(ServerWritableStream);
@@ -12,7 +12,7 @@ function generateServerStreamCall(ServerWritableStream) {
   ServerWritableStreamClone.metaData = undefined;
   ServerWritableStreamClone.body = ServerWritableStream.request;
   ServerWritableStreamClone.metadata = ServerWritableStream.metadata;
-  ServerWritableStreamClone.throw = function(err) {
+  ServerWritableStreamClone.throw = function (err) {
     if (!(err instanceof Error)) {
       throw new Error(
         "Please pass your error details as an Error class. Firecomm supports adding additional error metadata in the trailers property using context.setStatus()"
@@ -21,10 +21,10 @@ function generateServerStreamCall(ServerWritableStream) {
     err.metadata = generateMeta(this.trailerObject);
     this.emit("error", err);
   };
-  ServerWritableStreamClone.setStatus = function(trailerObject) {
+  ServerWritableStreamClone.setStatus = function (trailerObject) {
     this.trailerObject = trailerObject;
   };
-  ServerWritableStreamClone.sendMeta = function(metaObject) {
+  ServerWritableStreamClone.sendMeta = function (metaObject) {
     const metaData = new grpc.Metadata();
     const keys = Object.keys(metaObject);
     for (let i = 0; i < keys.length; i++) {
@@ -71,7 +71,7 @@ function generateServerStreamCall(ServerWritableStream) {
 //   }
 // }
 
-module.exports = function(ServerWritableStream) {
+export default (ServerWritableStream) {
   ServerWritableStreamClone = Object.create(ServerWritableStream);
   basicCallDecorator(ServerWritableStreamClone, ServerWritableStream);
   clientUnaryDecorator(ServerWritableStreamClone, ServerWritableStream);

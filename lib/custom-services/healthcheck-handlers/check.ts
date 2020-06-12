@@ -1,4 +1,4 @@
-module.exports = function(call) {
+export default function (call) {
   const { services: requestedServices } = call.body;
   const healthArray = [];
   if (!requestedServices.length) {
@@ -7,7 +7,7 @@ module.exports = function(call) {
     for (let i = 0; i < services.length; i++) {
       healthArray.push({
         service: services[i],
-        status: statusMap[services[i]]
+        status: statusMap[services[i]],
       });
     }
     return call.send({ health: healthArray });
@@ -24,11 +24,11 @@ module.exports = function(call) {
     }
     healthArray.push({
       service: requestedServices[i],
-      status: curStatus
+      status: curStatus,
     });
   }
   return call.send({
-    health: healthArray
+    health: healthArray,
   });
   // return health array
-};
+}

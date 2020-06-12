@@ -9,13 +9,13 @@
 
 //.emit
 
-const generateMeta = require("../../utils/generateMeta");
+import generateMeta from "../../utils/generateMeta";
 
-module.exports = function serverStreamDecorator(customCall, originalCall) {
+export default function serverStreamDecorator(customCall, originalCall) {
   customCall.metadata = undefined;
   customCall.metadataSent = false;
 
-  customCall.throw = function(err) {
+  customCall.throw = function (err) {
     if (!(err instanceof Error)) {
       throw new Error(
         "Please pass your error details as an Error class. Firecomm supports adding additional error metadata in the trailers property using context.setStatus()"
@@ -25,7 +25,7 @@ module.exports = function serverStreamDecorator(customCall, originalCall) {
     return this;
   };
 
-  customCall.set = function(object) {
+  customCall.set = function (object) {
     // loop through
     if (typeof object !== "object") {
       throw new Error("Set should be passed an object with string values.");
@@ -33,7 +33,7 @@ module.exports = function serverStreamDecorator(customCall, originalCall) {
     if (this.metadata) {
       this.metadata = {
         ...this.metadata,
-        ...object
+        ...object,
       };
     } else {
       this.metadata = object;
@@ -45,7 +45,7 @@ module.exports = function serverStreamDecorator(customCall, originalCall) {
   //   customCall.send(...args);
   // }
 
-  customCall.send = function(message) {
+  customCall.send = function (message) {
     if (!this.metadataSent && this.metadata) {
       const metadata = generateMeta(this.metadata);
       originalCall.sendMetadata(metadata);
@@ -53,4 +53,4 @@ module.exports = function serverStreamDecorator(customCall, originalCall) {
     originalCall.write(message);
   };
   return this;
-};
+}

@@ -1,7 +1,7 @@
-const grpc = require("grpc");
-const protoLoader = require("@grpc/proto-loader");
-const path = require("path");
-var PROTO_PATH = path.join(__dirname, "./examples/vanilla_gRPC/proto.proto");
+import grpc from "grpc";
+import protoLoader from "@grpc/proto-loader";
+import path from "path";
+const PROTO_PATH = path.join(__dirname, "./examples/vanilla_gRPC/proto.proto");
 
 /**
  *
@@ -21,7 +21,7 @@ function extractServiceNames(proto) {
 
   const definitions = Object.keys(package);
 
-  const services = definitions.filter(name => {
+  const services = definitions.filter((name) => {
     return package[name].hasOwnProperty("service");
   });
   return services;
@@ -32,7 +32,7 @@ function extractServiceDefinitions(proto, serviceNames) {
 
   const package = proto[packageName];
 
-  return serviceNames.map(serviceName => package[serviceName]);
+  return serviceNames.map((serviceName) => package[serviceName]);
 }
 
 function getServiceFromName(serviceName, proto) {
@@ -45,7 +45,7 @@ function getServiceFromName(serviceName, proto) {
 
 function extractMethodNames(serviceDefinition) {
   return Object.keys(serviceDefinition.service).map(
-    x => x[0].toLowerCase() + x.substring(1)
+    (x) => x[0].toLowerCase() + x.substring(1)
   );
 }
 
@@ -55,8 +55,4 @@ const package = buildPackage(PROTO_PATH);
 // console.log(Object.keys(definitions[0]));
 // console.log(extractMethodNames(definitions[0]));
 
-module.exports = {
-  extractServiceNames,
-  extractServiceDefinitions,
-  extractMethodNames
-};
+export { extractServiceNames, extractServiceDefinitions, extractMethodNames };

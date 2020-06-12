@@ -2,8 +2,8 @@
 
 // catch catches an error
 
-module.exports = function(customCall, originalCall) {
-  customCall.on = function(event, callback) {
+export default function (customCall, originalCall) {
+  customCall.on = function (event, callback) {
     if (typeof event === "function") {
       originalCall.on("data", event);
     } else if (typeof event === "string") {
@@ -24,8 +24,8 @@ module.exports = function(customCall, originalCall) {
     return this;
   };
 
-  customCall.catch = function(callback) {
+  customCall.catch = function (callback) {
     this.call.on("error", callback);
     return this;
   };
-};
+}

@@ -1,4 +1,4 @@
-const generateMeta = require("../utils/generateMeta");
+import generateMeta from "../utils/generateMeta";
 
 //create an object that extends the original call, redefine it's actual reference to be the following...
 
@@ -24,29 +24,29 @@ const generateMeta = require("../utils/generateMeta");
 
 //throw which will console.log(no throw on unary calls...)
 
-module.exports = function unaryCall(that, methodName, first, second) {
+export default function unaryCall(that, methodName, first, second) {
   let metadata;
   let interceptors;
   if (typeof first === "object") {
     if (Array.isArray(first)) {
       interceptors = { interceptors: first };
     } else {
-      const {options} = first;
+      const { options } = first;
       delete first.options;
       metadata = generateMeta(first, options);
     }
-  };
+  }
   if (typeof second === "object") {
     if (Array.isArray(second)) {
       interceptors = { interceptors: second };
     } else {
-      const {options} = second;
+      const { options } = second;
       delete second.options;
       metadata = generateMeta(second, options);
     }
-  };
+  }
   const unaryObj = {
-    write: function(...args) {
+    write: function (...args) {
       this.send(...args);
       return unaryObj;
     },
@@ -54,31 +54,39 @@ module.exports = function unaryCall(that, methodName, first, second) {
       that[methodName](message, metadata, interceptors, callback);
       return unaryObj;
     },
-    $catch: () => {throw new Error('Unary Call: .catch and .on must be defined before .send')},
+    $catch: () => {
+      throw new Error(
+        "Unary Call: .catch and .on must be defined before .send"
+      );
+    },
     catch: (first) => {
-      if (typeof first !== 'function') {
-        throw new Error('Unary Call: catch takes a callback')
+      if (typeof first !== "function") {
+        throw new Error("Unary Call: catch takes a callback");
       }
       unaryObj.$catch = first;
       return unaryObj;
     },
-    $on: () => {throw new Error('Unary Call: .catch and .on must be defined before .send')},
+    $on: () => {
+      throw new Error(
+        "Unary Call: .catch and .on must be defined before .send"
+      );
+    },
     on: (first, second) => {
       let listenerCallback;
-      if (typeof first !== 'function' && typeof second !== 'function') {
-        throw new Error('Unary Call: on takes a callback')
-      };
-      if (typeof first === 'function') {
+      if (typeof first !== "function" && typeof second !== "function") {
+        throw new Error("Unary Call: on takes a callback");
+      }
+      if (typeof first === "function") {
         listenerCallback = first;
       } else {
         listenerCallback = second;
       }
       unaryObj.$on = listenerCallback;
       return unaryObj;
-    }
+    },
   };
-  let callback = function(err, res) {
-    if(err) unaryObj.$catch(err);
+  let callback = function (err, res) {
+    if (err) unaryObj.$catch(err);
     unaryObj.$on(res);
     return unaryObj;
   };

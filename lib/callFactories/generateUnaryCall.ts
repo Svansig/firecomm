@@ -1,8 +1,8 @@
-const grpc = require("grpc");
+import grpc from "grpc";
 
-const basicCallDecorator = require("./callDecorators/basicCallDecorator");
-const serverUnaryDecorator = require("./callDecorators/serverUnaryDecorator");
-const clientUnaryDecorator = require("./callDecorators/clientUnaryDecorator");
+import basicCallDecorator from "./callDecorators/basicCallDecorator";
+import serverUnaryDecorator from "./callDecorators/serverUnaryDecorator";
+import clientUnaryDecorator from "./callDecorators/clientUnaryDecorator";
 
 // function serverUnaryDecorator(callClone, serverCall, callback) {
 //   callClone...
@@ -24,7 +24,7 @@ function generateUnaryCall(ServerUnaryCall, callback) {
   ServerUnaryCallClone.trailer = undefined;
   ServerUnaryCallClone.body = ServerUnaryCall.request;
   ServerUnaryCallClone.metadata = ServerUnaryCall.metadata;
-  ServerUnaryCallClone.throw = function(err) {
+  ServerUnaryCallClone.throw = function (err) {
     if (!(err instanceof Error)) {
       throw new Error(
         "Please pass your error details as an Error class. Firecomm supports adding additional error metadata in the trailers property using call.setStatus()"
@@ -32,7 +32,7 @@ function generateUnaryCall(ServerUnaryCall, callback) {
     }
     this.callback(err, {}, this.trailer);
   };
-  ServerUnaryCallClone.setMeta = function(metaObject) {
+  ServerUnaryCallClone.setMeta = function (metaObject) {
     if (!this.metaData) {
       this.metaData = new grpc.Metadata();
     }
@@ -42,7 +42,7 @@ function generateUnaryCall(ServerUnaryCall, callback) {
     }
   };
 
-  ServerUnaryCallClone.setStatus = function(metaObject) {
+  ServerUnaryCallClone.setStatus = function (metaObject) {
     if (!this.trailer) {
       this.trailer = new grpc.Metadata();
     }
@@ -52,7 +52,7 @@ function generateUnaryCall(ServerUnaryCall, callback) {
     }
   };
 
-  ServerUnaryCallClone.send = function(message = {}) {
+  ServerUnaryCallClone.send = function (message = {}) {
     if (this.metaData) {
       this.sendMetadata(this.metaData);
     }
@@ -61,10 +61,10 @@ function generateUnaryCall(ServerUnaryCall, callback) {
   return ServerUnaryCallClone;
 }
 
-module.exports = function(ServerUnaryCall, callback) {
+export default function (ServerUnaryCall, callback) {
   const ServerUnaryCallClone = Object.create(ServerUnaryCall);
   basicCallDecorator(ServerUnaryCallClone, ServerUnaryCall);
   clientUnaryDecorator(ServerUnaryCallClone, ServerUnaryCall);
   serverUnaryDecorator(ServerUnaryCallClone, callback);
   return ServerUnaryCallClone;
-};
+}

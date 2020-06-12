@@ -1,10 +1,10 @@
-const grpc = require("grpc");
+import grpc from "grpc";
 
-const basicCallDecorator = require("./callDecorators/basicCallDecorator");
-const clientStreamDecorator = require("./callDecorators/clientStreamDecorator");
-const serverStreamDecorator = require("./callDecorators/serverStreamDecorator");
+import basicCallDecorator from "./callDecorators/basicCallDecorator";
+import clientStreamDecorator from "./callDecorators/clientStreamDecorator";
+import serverStreamDecorator from "./callDecorators/serverStreamDecorator";
 
-const generateMeta = require("../utils/generateMeta");
+import generateMeta from "../utils/generateMeta";
 
 // function will take in a duplex call constructor, and return a class which extends the class with our own built in methods on top
 
@@ -12,7 +12,7 @@ function generateDuplex(ServerDuplexStream) {
   const ServerDuplexStreamClone = Object.create(ServerDuplexStream);
   ServerDuplexStreamClone.trailerObject = undefined;
   ServerDuplexStreamClone.state = null;
-  ServerDuplexStreamClone.throw = function(err) {
+  ServerDuplexStreamClone.throw = function (err) {
     if (!(err instanceof Error)) {
       throw new Error(
         "Please pass your error details as an Error class. Firecomm supports adding additional error metadata in the trailers property using context.setStatus()"
@@ -21,10 +21,10 @@ function generateDuplex(ServerDuplexStream) {
     err.metadata = generateMeta(this.trailerObject);
     this.emit("error", err);
   };
-  ServerDuplexStreamClone.setStatus = function(trailerObject) {
+  ServerDuplexStreamClone.setStatus = function (trailerObject) {
     this.trailerObject = trailerObject;
   };
-  ServerDuplexStreamClone.sendMeta = function(metaObject) {
+  ServerDuplexStreamClone.sendMeta = function (metaObject) {
     const metaData = new grpc.Metadata();
     const keys = Object.keys(metaObject);
     for (let i = 0; i < keys.length; i++) {
@@ -35,10 +35,10 @@ function generateDuplex(ServerDuplexStream) {
   return ServerDuplexStreamClone;
 }
 
-module.exports = function(ServerDuplexStream) {
+export default function (ServerDuplexStream) {
   const ServerDuplexStreamClone = Object.create(ServerDuplexStream);
   basicCallDecorator(ServerDuplexStreamClone, ServerDuplexStream);
   clientStreamDecorator(ServerDuplexStreamClone, ServerDuplexStream);
   serverStreamDecorator(ServerDuplexStream, ServerDuplexStream);
   return ServerDuplexStreamClone;
-};
+}

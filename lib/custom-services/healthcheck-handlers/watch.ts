@@ -12,7 +12,7 @@ function sendStatusUpdate(Server, call, requestedServices) {
     for (let i = 0; i < services.length; i++) {
       healthArray.push({
         service: services[i],
-        status: statusMap[services[i]]
+        status: statusMap[services[i]],
       });
     }
     return call.send({ health: healthArray });
@@ -29,15 +29,15 @@ function sendStatusUpdate(Server, call, requestedServices) {
     }
     healthArray.push({
       service: requestedServices[i],
-      status: curStatus
+      status: curStatus,
     });
   }
   return call.send({
-    health: healthArray
+    health: healthArray,
   });
 }
 
-module.exports = function(call) {
+export default function (call) {
   let { interval, services } = call.body;
 
   // if interval is 0, set it to be 60seconds for a default
@@ -56,4 +56,4 @@ module.exports = function(call) {
   // setInterval at "interval seconds"
   // run sendStatusUpdate to sendStatusUpdate calling on server and the services destructured off of call
   // add logic to .throw
-};
+}

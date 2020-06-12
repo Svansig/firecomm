@@ -73,7 +73,7 @@
   "homepage": "https://github.com/oslabs-beta/firecomm#readme",
   "dependencies": {
     "@grpc/proto-loader": "^0.5.1",
-    "grpc": "^1.22.2",
+    "grpc": "^1.24.3",
     "jsdoc": "^3.6.3"
   },
   "devDependencies": {

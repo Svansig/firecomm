@@ -1,7 +1,8 @@
 // const grpc = require("grpc");
-const path = require("path");
-const build = require("../build");
+import path from "path";
+import build from "../build";
+
 const PROTO_PATH = path.join(__dirname, "./healthcheck.proto");
 
 const healthcheck = build(PROTO_PATH);
-module.exports = healthcheck;
+export default healthcheck;

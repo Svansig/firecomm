@@ -1,8 +1,8 @@
-const generateUnaryCall = require("./callFactories/generateUnaryCall");
-const generateClientStreamCall = require("./callFactories/generateClientStreamCall");
-const generateServerStreamCall = require("./callFactories/generateServerStreamCall");
-const generateDuplex = require("./callFactories/generateDuplex");
-const getMethodType = require("./utils/getMethodType");
+import generateUnaryCall from "./callFactories/generateUnaryCall";
+import generateClientStreamCall from "./callFactories/generateClientStreamCall";
+import generateServerStreamCall from "./callFactories/generateServerStreamCall";
+import generateDuplex from "./callFactories/generateDuplex";
+import getMethodType from "./utils/getMethodType";
 
 module.exports = function compose(
   { handler, middlewareStack },
@@ -24,7 +24,7 @@ module.exports = function compose(
   switch (methodType) {
     case "Duplex":
       // class Context {}
-      return async function(call) {
+      return async function (call) {
         let duplexCall = generateDuplex(call);
         for (let i = 0; i < middlewareStack.length; i++) {
           try {
@@ -46,7 +46,7 @@ module.exports = function compose(
       };
     case "ClientStream":
       // class Context {}
-      return async function(call, callback) {
+      return async function (call, callback) {
         // console.log("inside of client stream compose", { call }, { callback });
         let clientStreamCall = generateClientStreamCall(call, callback);
         for (let i = 0; i < middlewareStack.length; i++) {
@@ -69,7 +69,7 @@ module.exports = function compose(
       };
     case "ServerStream":
       // class Context {}
-      return async function(call) {
+      return async function (call) {
         let serverStreamCall = generateServerStreamCall(call);
         for (let i = 0; i < middlewareStack.length; i++) {
           try {
@@ -90,7 +90,7 @@ module.exports = function compose(
         }
       };
     case "Unary":
-      return async function(call, callback) {
+      return async function (call, callback) {
         let unaryCall = generateUnaryCall(call, callback);
         for (let i = 0; i < middlewareStack.length; i++) {
           try {
